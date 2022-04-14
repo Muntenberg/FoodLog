@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">FoodLog</string>
+    <string name="entryAddButton">Add To Database</string>
+    <string name="entryHomeButton">Go Back</string>
+    <string name="homeAddButton">Add</string>
+    <string name="foodratio">Food</string>
+    <string name="waterratio">Water</string>
+    <string name="datebutton">Slect Date and Time</string>
+    <string-array name="waterUnits">
+        <item>Ounces</item>
+        <item>Liters</item>
+    </string-array>
+</resources>
