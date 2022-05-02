@@ -130,7 +130,7 @@ class Add_Entry : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimeP
     override fun onDateSet(p0: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
         savedDay = dayOfMonth
         savedYear = year
-        savedMonth = month
+        savedMonth = month + 1
 
         getDateTimeCalendar()
 
@@ -141,7 +141,7 @@ class Add_Entry : AppCompatActivity(), DatePickerDialog.OnDateSetListener, TimeP
         savedHour = hourOfDay
         savedMinute = minute
         var datetext = findViewById<TextView>(R.id.selectedDateText)
-        datetext.text = "Selected Date and Time: $savedDay-$savedMonth-$savedYear $savedHour:$savedMinute"
+        datetext.text = "Selected Date and Time: $savedDay-${savedMonth}-$savedYear $savedHour:$savedMinute"
     }
 
     private fun dateZeroAdder(Year: Int, Day: Int, Month: Int, Hour: Int, Minute: Int): String {

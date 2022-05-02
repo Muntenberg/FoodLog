@@ -34,6 +34,13 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
 
         }
+        var homeStatButton = findViewById<Button>(R.id.homeStatButton)
+        homeStatButton.setOnClickListener{
+
+            var intent = Intent(this,stats::class.java)
+            startActivity(intent)
+
+        }
 
         var ReViewData = mutableListOf<logListData>()
 //        var datetext = findViewById<TextView>(R.id.listTest)

@@ -10,6 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FoodLog">
         <activity
+            android:name=".stats"
+            android:exported="false" />
+        <activity
             android:name=".Add_Entry"
             android:exported="false" />
         <activity
