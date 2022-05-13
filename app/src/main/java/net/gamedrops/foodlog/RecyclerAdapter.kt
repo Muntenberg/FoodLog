@@ -1,5 +1,6 @@
 package net.gamedrops.foodlog
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,56 +11,24 @@ import androidx.recyclerview.widget.RecyclerView
 import net.gamedrops.foodlog.databinding.ActivityMainBinding
 import org.w3c.dom.Text
 
-//class RecyclerAdapter: RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
-//
-//    private var name = arrayOf("brah", "ree", "two")
-//    private var date = arrayOf("someday", "someday", "someday")
-//    private var valuelist = arrayOf("34", "343", "234234")
-//    private var type = arrayOf(R.drawable.foodicon, R.drawable.watericon, R.drawable.foodicon)
-//
-//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerAdapter.ViewHolder {
-//        val v = LayoutInflater.from(parent.context).inflate(R.layout.logitemrow, parent, false)
-//        return ViewHolder(v)
-//    }
-//
-//    override fun onBindViewHolder(holder: RecyclerAdapter.ViewHolder, position: Int) {
-//        holder.itemTitle.text = name[position]
-//        holder.itemImage.setImageResource(type[position])
-//        holder.itemDate.text = date[position]
-//        holder.itemVal.text = valuelist[position]
-//
-//    }
-//
-//    override fun getItemCount(): Int {
-//        TODO("Not yet implemented")
-//    }
-//
-//    inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
-//        var itemImage: ImageView
-//        var itemTitle: TextView
-//        var itemDate: TextView
-//        var itemVal: TextView
-//        var itemRemove: ImageView
-//
-//        init {
-//            itemImage = itemView.findViewById(R.id.typeImageRe)
-//            itemTitle = itemView.findViewById(R.id.nameText)
-//            itemDate = itemView.findViewById(R.id.dateText)
-//            itemVal = itemView.findViewById(R.id.valueText)
-//            itemRemove = itemView.findViewById(R.id.removeButton)
-//        }
-//
-//    }
-//
-//}
-//
-//data class Test(val imageResource: Int, val title: String, val date: String, val valu: String)
-
 class foodAdapter(
     var listData: List<logListData>
     ) : RecyclerView.Adapter<foodAdapter.FoodViewHolder>() {
 
-    inner class FoodViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+    inner class FoodViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
+        var dButton:ImageView
+        init {
+            dButton = itemView.findViewById(R.id.imageView2)
+            val sharedPreferences = itemView.getContext().getSharedPreferences("Add_Entry", Context.MODE_PRIVATE)
+            val mEditor = sharedPreferences.edit()
+            dButton.setOnClickListener{ println("Button Clicked " + listData[position].date) }
+            dButton.setOnClickListener{
+                println("Button Clicked " + listData[position].date)
+                mEditor.remove(listData[position].date).apply()
+                notifyDataSetChanged()
+            }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FoodViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.logitemrow, parent, false)

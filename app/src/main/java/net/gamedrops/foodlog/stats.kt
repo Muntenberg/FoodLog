@@ -26,9 +26,12 @@ class stats : AppCompatActivity() {
     lateinit var lineDataSet: BarDataSet
     lateinit var barData: BarData
 
+    lateinit var waterBarList: ArrayList<BarEntry>
+    lateinit var foodBarList: ArrayList<BarEntry>
+
     private lateinit var barChart: BarChart
     private var scoreList = ArrayList<DayWeekData>()
-//
+    //
     data class DayWeekData(
         val day:String,
         val data: Float
@@ -57,19 +60,24 @@ class stats : AppCompatActivity() {
         for (br in dateListSorted) {
             dateDataList.add(sharedPreferences.getString(br, null).toString().split(","))
         }
-        var weekAvg = WeekAverage(dateObj, dateListSorted, dateDataList)
-        println(weekAvg)
+        var weekFoodAvg = WeekAverage(dateObj, dateListSorted, dateDataList, "Food")
+        var weekWaterAvg = WeekWaterAverage(dateObj, dateListSorted, dateDataList, "Water")
+        println(weekFoodAvg)
         var toDay = LocalDateTime.now()
         var orderOfWeek = weekOrder(stringToWeekInt(toDay.dayOfWeek.toString()))
         println(orderOfWeek)
         var weektext = findViewById<TextView>(R.id.weekAv)
-        var wt = "Week Averages\n"
-        for (y in orderOfWeek){
-            wt += "${IntToWeekString(y)}: ${weekAvg[y]}\n"
+        var weekWaterText = findViewById<TextView>(R.id.weekAv2)
+        var wt = "Week Food Averages\n"
+        var wtwater = "Week Water Averages\n"
+        for (y in orderOfWeek.reversed()){
+            wt += "${IntToWeekString(y)}: ${weekFoodAvg[y]}\n"
+            wtwater += "${IntToWeekString(y)}: ${weekWaterAvg[y]}\n"
         }
         weektext.text = wt
+        weekWaterText.text = wtwater
 
-//        var barChart = findViewById<BarChart>(R.id.barChart)
+        var barChart = findViewById<BarChart>(R.id.barChart)
 //        scoreList = getScoreList()
 //        val entries: ArrayList<BarEntry> = ArrayList()
 //        for (i in scoreList.indices) {
@@ -113,10 +121,46 @@ class stats : AppCompatActivity() {
 //        scoreList.add(DayWeekData("Jeff", 63f))
 //
 //        return scoreList
+
+//        waterBarList = ArrayList()
+//        foodBarList = ArrayList()
+//
+//        for (y in orderOfWeek){
+//            foodBarList.add((BarEntry(y.toFloat(), weekFoodAvg[y].toFloat())))
+//            waterBarList.add((BarEntry(y.toFloat(), weekWaterAvg[y].toFloat())))
+//        }
+//
+//        val barWaterSet = BarDataSet(waterBarList, "Water")
+//        barWaterSet.color=Color.CYAN
+//        val barFoodSet = BarDataSet(foodBarList, "Food")
+//        barFoodSet.color=Color.YELLOW
+//
+
+        waterBarList = ArrayList()
+        foodBarList = ArrayList()
+
+        for (y in orderOfWeek){
+            foodBarList.add((BarEntry(y.toFloat(), weekFoodAvg[y].toFloat())))
+            waterBarList.add((BarEntry(y.toFloat(), weekWaterAvg[y])))
+        }
+
+        val barWaterSet = BarDataSet(waterBarList, "Water")
+        barWaterSet.color=Color.CYAN
+        val barFoodSet = BarDataSet(foodBarList, "Food")
+        barFoodSet.color=Color.YELLOW
+
+        val barData = BarData(barFoodSet, barWaterSet)
+        barChart.data = barData
+
+        barData.barWidth = 0.17f
+        barChart.xAxis.axisMinimum = 0f
+        barChart.xAxis.axisMaximum = 0 + barChart.barData.getGroupWidth(0.3f, 0.03f) * 7
+        barChart.groupBars(0f, 0.3f, 0.03f)
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun WeekAverage(objDate: MutableList<Date>, dateList: List<String>, dateDataList: MutableList<List<String>>) : MutableList<Int> {
+    private fun WeekAverage(objDate: MutableList<Date>, dateList: List<String>, dateDataList: MutableList<List<String>>, itemType: String) : MutableList<Int> {
         var todayDate = LocalDateTime.now()
         var lastweek = todayDate.minusDays(6).withHour(0).withMinute(0).withSecond(0)
         var weekAvg= mutableListOf<Int>()
@@ -128,13 +172,35 @@ class stats : AppCompatActivity() {
             weekAvg.add(0)
         }
         for (x in dateList) {
-            if (SimpleDateFormat("dd-MM-yyyy | HH:mm").parse("${lastweek.dayOfMonth}-${lastweek.monthValue}-${lastweek.year} | 00:00") <= objDate[dateList.indexOf(x)] && objDate[dateList.indexOf(x)] <= SimpleDateFormat("dd-MM-yyyy | HH:mm").parse("${todayDate.dayOfMonth}-${todayDate.monthValue}-${todayDate.year} | 23:59")){
+            if (SimpleDateFormat("dd-MM-yyyy | HH:mm").parse("${lastweek.dayOfMonth}-${lastweek.monthValue}-${lastweek.year} | 00:00") <= objDate[dateList.indexOf(x)] && objDate[dateList.indexOf(x)] <= SimpleDateFormat("dd-MM-yyyy | HH:mm").parse("${todayDate.dayOfMonth}-${todayDate.monthValue}-${todayDate.year} | 23:59") && dateDataList[dateList.indexOf(x)][0] == itemType){
                 println(objDate[dateList.indexOf(x)].day)
                 weekAvg[objDate[dateList.indexOf(x)].day] += dateDataList[dateList.indexOf(x)][2].toInt()
             }
         }
         return weekAvg
     }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun WeekWaterAverage(objDate: MutableList<Date>, dateList: List<String>, dateDataList: MutableList<List<String>>, itemType: String) : MutableList<Float> {
+        var todayDate = LocalDateTime.now()
+        var lastweek = todayDate.minusDays(6).withHour(0).withMinute(0).withSecond(0)
+        var weekAvg= mutableListOf<Float>()
+//        println(objDate[1].after(SimpleDateFormat("dd-MM-yyyy | HH:mm").parse("${lastweek.dayOfMonth}-${lastweek.monthValue}-${lastweek.year} | 00:00")) )
+        println(objDate)
+        println(lastweek)
+        println(SimpleDateFormat("dd-MM-yyyy | HH:mm").parse("${lastweek.dayOfMonth}-${lastweek.monthValue}-${lastweek.year} | 00:00"))
+        for (num in 0..6) {
+            weekAvg.add(0f)
+        }
+        for (x in dateList) {
+            if (SimpleDateFormat("dd-MM-yyyy | HH:mm").parse("${lastweek.dayOfMonth}-${lastweek.monthValue}-${lastweek.year} | 00:00") <= objDate[dateList.indexOf(x)] && objDate[dateList.indexOf(x)] <= SimpleDateFormat("dd-MM-yyyy | HH:mm").parse("${todayDate.dayOfMonth}-${todayDate.monthValue}-${todayDate.year} | 23:59") && dateDataList[dateList.indexOf(x)][0] == itemType){
+                println(objDate[dateList.indexOf(x)].day)
+                weekAvg[objDate[dateList.indexOf(x)].day] += dateDataList[dateList.indexOf(x)][2].toFloat()
+            }
+        }
+        return weekAvg
+    }
+
 
     private fun weekOrder(day: Int) : MutableList<Int> {
         var array = mutableListOf<Int>()
@@ -160,9 +226,9 @@ class stats : AppCompatActivity() {
             "THURSDAY" -> return 4
             "FRIDAY" -> return 5
             "SATURDAY" -> return 6
-            }
-        return 0
         }
+        return 0
+    }
 
     private fun IntToWeekString(Day: Int) : String {
         when(Day) {
@@ -176,4 +242,4 @@ class stats : AppCompatActivity() {
         }
         return ""
     }
-    }
+}
